@@ -42,9 +42,13 @@ Follow these steps to contribute your changes to **ChaatBazaar**:
    ```bash
    git clone https://github.com/PatelHarsh2006/ChaatBazaar.git
    ```
-   OR 
-  In Github Desktop app : 
-  Current repository  ->  Add  ->> Clone repository  ->  Choose repository  ->  Clone.
+   <center>OR </center>
+  **In Github Desktop app : **
+    1. Click **Current repository**
+    2. Click  **Add**
+    3. Click  **Clone repository**
+    4. Choose repository
+    6. Click **Clone**.
    
  3. Create a Branch
     Navigate to the project directory and create a new branch for your changes:
@@ -131,6 +135,9 @@ Done ✔️
 
 In Github Desktop app :
 
-Set current Repository to ChatBazaar  ->  Fetch Origin  ->  Pull changes (if visible)
+1. Open GitHub Desktop  
+2. Select the repository: **ChaatBazaar**  
+3. Click **Fetch origin**  
+4. Click **Pull origin** (if visible)
 
 ---
