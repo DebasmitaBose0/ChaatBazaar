@@ -49,7 +49,69 @@ Built with modern, lightweight web technologies:
 * <img src="https://img.shields.io/badge/JSON-000000?style=flat-square&logo=json&logoColor=white" alt="JSON" />
 * <img src="https://img.shields.io/badge/GitHub_Pages-222222?style=flat-square&logo=github-pages&logoColor=white" alt="GitHub Pages" />
 
+
 <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
+
+
+## Important points for Contributors to keep in Mind :
+
+1. Maintain the Orange theme, throughout the Wesbite.
+
+2. Include "Before" and "After" screenshots of the webpage for all changes, in the Pull Request description.
+
+3. Install the "Live Server" extension and run the project, through Live Server to prevent issues such as images or pages not displaying correctly due to relative file paths.
+
+4. If the original repository gets updated after you fork it, you should sync your fork before creating a new PR. This prevents merge conflicts and outdated code.<br>
+So always follow the below steps, before any Pull request, for the corresponding Branch, to keep the repository upto date :
+
+
+
+## Method 1: Using Git Commands (Terminal Users)
+
+### Step - 1 : Fetch latest changes from original repo
+   ```bash
+   git fetch upstream
+   ```
+
+
+
+
+### Step - 2 : Merge changes into your local main branch
+   ```bash
+   git merge upstream/main
+   ```
+
+
+
+### Step - 3 : Push updated code to your fork
+   ```bash
+   git push origin main
+   ```
+
+
+
+## Method 2:  If using Github Desktop app :
+
+### Step - 1: 
+1. Go to your forked repository on GitHub webpage
+2. Click "Sync fork" button (if visible)
+3. Click "Update branch"
+
+
+
+
+### Step - 2: 
+
+In Github Desktop app :
+
+1. Open GitHub Desktop  
+2. Select the repository: **ChaatBazaar**  
+3. Click **Fetch origin**  
+4. Click **Pull origin** (if visible)
+
+   
+<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
+
 
 ## 📥 Submitting a Pull Request for First time :
 
@@ -111,63 +173,6 @@ Follow these steps to contribute your changes to **ChaatBazaar**:
 
 <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
-## Important points for Contributors to keep in Mind :
-
-1. Maintain the Orange theme, throughout the Wesbite.
-
-2. Include "Before" and "After" screenshots of the webpage for all changes, in the Pull Request description.
-
-3. Install the "Live Server" extension and run the project, through Live Server to prevent issues such as images or pages not displaying correctly due to relative file paths.
-
-4. If the original repository gets updated after you fork it, you should sync your fork before creating a new PR. This prevents merge conflicts and outdated code.<br>
-So always follow the below steps, before any Pull request, for the corresponding Branch, to keep the repository upto date :
-
-
-
-## Method 1: Using Git Commands (Terminal Users)
-
-### Step - 1 : Fetch latest changes from original repo
-   ```bash
-   git fetch upstream
-   ```
-
-
-
-
-### Step - 2 : Merge changes into your local main branch
-   ```bash
-   git merge upstream/main
-   ```
-
-
-
-### Step - 3 : Push updated code to your fork
-   ```bash
-   git push origin main
-   ```
-
-
-
-## Method 2:  If using Github Desktop app :
-
-### Step - 1: 
-1. Go to your forked repository on GitHub webpage
-2. Click "Sync fork" button (if visible)
-3. Click "Update branch"
-
-
-
-
-### Step - 2: 
-
-In Github Desktop app :
-
-1. Open GitHub Desktop  
-2. Select the repository: **ChaatBazaar**  
-3. Click **Fetch origin**  
-4. Click **Pull origin** (if visible)
-   
-<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
 ## 📜 License <a name="-license"></a>
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/PatelHarsh2006/ChaatBazaar/blob/main/LICENSE) file for details.
