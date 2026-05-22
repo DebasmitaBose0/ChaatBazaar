@@ -6,26 +6,13 @@
 
 ChaatBazaar is an interactive online street food platform dedicated to bringing authentic Indian snacks like samosa, kachori, and pani puri closer to food lovers within a 5 km delivery radius. It helps users discover regional delicacies often overshadowed by global food trends.
 
-<p align="center">
-  <a href="https://patelharsh2006.github.io/ChaatBazaar/">Live Link</a>
-</p>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
-
-## 📖 Table of Contents
-* [About the Project](#-about-the-project)
-* [Key Features](#-key-features)
-* [Visual Showcase](#-visual-showcase)
-* [Tech Stack](#-tech-stack)
-* [Documentation](#-documentation)
-* [Contact](#contacts)
+Demo Link : <a href="https://patelharsh2006.github.io/ChaatBazaar/">Link</a>
 
 <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
 ## 🚀 About the Project <a name="-about-the-project"></a>
 **ChaatBazaar** is a responsive, mobile-first web application designed to bring the vibrant experience of Indian street food directly to your screens. With location-based delivery checks, intuitive categorization, and a dynamic cart system, it offers a seamless ordering experience tailored for cravings.
 
-<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
 ## ✨ Key Features <a name="-key-features"></a>
 
@@ -61,15 +48,6 @@ Built with modern, lightweight web technologies:
 * <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" />
 * <img src="https://img.shields.io/badge/JSON-000000?style=flat-square&logo=json&logoColor=white" alt="JSON" />
 * <img src="https://img.shields.io/badge/GitHub_Pages-222222?style=flat-square&logo=github-pages&logoColor=white" alt="GitHub Pages" />
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
-
-## 📚 Documentation <a name="-documentation"></a>
-
-### 🚨 Important Rules for Contributors
-1. **Theme Consistency:** You **MUST** maintain the Orange theme throughout the website.
-2. **Visual Proof:** Always include **"Before" and "After" screenshots** of the webpage in your Pull Request description.
-3. **Stay Updated:** Sync your fork before creating a new PR to prevent merge conflicts and outdated code.
 
 <img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
@@ -130,6 +108,8 @@ Follow these steps to contribute your changes to **ChaatBazaar**:
 
     Link the related issue (if any) and clearly describe your changes.
 
+
+<img src="https://capsule-render.vercel.app/api?type=rect&height=4&color=FF7B54" width="100%">
 
 ## Important points for Contributors to keep in Mind :
 
