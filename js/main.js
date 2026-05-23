@@ -91,9 +91,24 @@ function createCard(item, highlightQuery = "") {
       <div class="card-tags">${dietaryTags}</div>
     </div>
     <div class="card-footer">
-      <span class="price">${formatPrice(item.price)}</span>
-      <button class="add-btn" aria-label="Add ${item.name} to cart">Add</button>
-    </div>
+  <div class="price-section">
+    <span class="original-price">
+      ₹${item.originalPrice}
+    </span>
+
+    <span class="price">
+      ${formatPrice(item.price)}
+    </span>
+
+    <span class="discount-badge">
+      ${Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
+    </span>
+  </div>
+
+  <button class="add-btn" aria-label="Add ${item.name} to cart">
+    Add
+  </button>
+  </div>
   `;
 
   const addBtn = card.querySelector(".add-btn");
