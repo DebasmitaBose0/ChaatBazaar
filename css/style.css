@@ -242,6 +242,7 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       user-select: none;
       cursor: default;
+      position: relative;
     }
     .card:hover {
       transform: translateY(-8px);
@@ -297,6 +298,51 @@
     .btn-add:hover {
       background: #e64a19;
       box-shadow: 0 8px 20px rgb(230 74 25 / 0.8);
+    }
+
+    /* ===== Favorite Button ===== */
+    .btn-favorite {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #ccc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      z-index: 5;
+    }
+    .btn-favorite:hover {
+      transform: scale(1.1);
+    }
+    .btn-favorite.is-favorite {
+      color: #ff3366;
+    }
+    .btn-favorite i {
+      pointer-events: none;
+    }
+    
+    /* ===== Empty Favorites ===== */
+    .empty-favorites {
+      text-align: center;
+      padding: 4rem 1rem;
+      width: 100%;
+    }
+    .empty-favorites h2 {
+      font-size: 2rem;
+      color: #bf360c;
+      margin-bottom: 1rem;
+    }
+    .empty-favorites p {
+      color: #5d4037;
+      font-size: 1.1rem;
     }
 
     /* ===== Menu Filters ===== */
@@ -1273,13 +1319,14 @@ mark.highlight {
   transform: translateY(-1px);
 }
 
-/* ===== Orders Dashboard Layout ===== */
-.orders-page {
+/* ===== Orders Dashboard & Favorites Layout ===== */
+.orders-page, .favorites-page {
   padding-top: 4rem;
   padding-bottom: 5rem;
+  min-height: 60vh;
 }
 
-.orders-page h1 {
+.orders-page h1, .favorites-page h1 {
   font-size: 2.2rem;
   color: #bf360c;
   margin-bottom: 2.5rem;

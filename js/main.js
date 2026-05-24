@@ -27,6 +27,12 @@ const checkoutBtn = document.getElementById("checkout-btn");
 
 let cart = JSON.parse(localStorage.getItem('chaatCart')) || [];
 
+let favorites = JSON.parse(localStorage.getItem('chaatFavorites')) || [];
+
+function saveFavorites() {
+  localStorage.setItem('chaatFavorites', JSON.stringify(favorites));
+}
+
 function saveCart() {
   localStorage.setItem('chaatCart', JSON.stringify(cart));
 }
@@ -79,7 +85,14 @@ function createCard(item, highlightQuery = "") {
   const highlightedName = highlightText(item.name, highlightQuery);
   const highlightedDesc = highlightText(item.description, highlightQuery);
 
+  const isFav = favorites.includes(item.id);
+  const favClass = isFav ? "is-favorite" : "";
+  const favIcon = isFav ? "fa-solid fa-heart" : "fa-regular fa-heart";
+
   card.innerHTML = `
+    <button class="btn-favorite ${favClass}" data-id="${item.id}" aria-label="Toggle favorite">
+      <i class="${favIcon}"></i>
+    </button>
     <img src="${item.image}" alt="${item.name}" loading="lazy" />
     <div class="card-content">
       <div class="card-meta">
@@ -98,6 +111,15 @@ function createCard(item, highlightQuery = "") {
 
   const addBtn = card.querySelector(".add-btn");
   addBtn.addEventListener("click", () => addToCart(item.id));
+
+  const favBtn = card.querySelector(".btn-favorite");
+  if (favBtn) {
+    favBtn.addEventListener("click", (e) => {
+
+      e.stopPropagation();
+      toggleFavorite(item.id);
+    });
+  }
 
   return card;
 }
@@ -190,6 +212,61 @@ function applyAllFilters() {
       menuContainer.appendChild(createCard(item, query));
     });
   }, 800);
+}
+
+// ===== Favorites Operations =====
+
+window.toggleFavorite = function (id) {
+  const index = favorites.indexOf(id);
+  if (index === -1) {
+    favorites.push(id);
+  } else {
+    favorites.splice(index, 1);
+  }
+  saveFavorites();
+  updateFavoriteButtons(id);
+
+  if (document.getElementById("favorites-container")) {
+    renderFavoritesList();
+  }
+};
+
+function updateFavoriteButtons(id) {
+  const isFav = favorites.includes(id);
+  const favBtns = document.querySelectorAll(`.btn-favorite[data-id="${id}"]`);
+  favBtns.forEach(btn => {
+    if (isFav) {
+      btn.classList.add("is-favorite");
+      btn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+    } else {
+      btn.classList.remove("is-favorite");
+      btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
+    }
+  });
+}
+
+function renderFavoritesList() {
+  const container = document.getElementById("favorites-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (favorites.length === 0) {
+    container.innerHTML = `
+      <div class="empty-favorites">
+        <h2>No Favorites Yet</h2>
+        <p>You haven't added any items to your favorites. Explore our menu to discover delicious chaat!</p>
+        <a href="menu.html" class="btn-primary" style="display:inline-block;margin-top:1.5rem;text-decoration:none;">Explore Menu</a>
+      </div>
+    `;
+    return;
+  }
+
+  const favoriteItems = menuItems.filter(item => favorites.includes(item.id));
+
+  favoriteItems.forEach(item => {
+    container.appendChild(createCard(item));
+  });
 }
 
 function renderCart() {
@@ -334,13 +411,13 @@ function renderOrdersList() {
   orders.forEach(order => {
     const card = document.createElement("article");
     card.className = "order-card";
-    
+
     const isPreparing = order.status === "Preparing" || order.status === "On the Way" || order.status === "Delivered" ? "active" : "";
     const isOnWay = order.status === "On the Way" || order.status === "Delivered" ? "active" : "";
     const isDelivered = order.status === "Delivered" ? "active" : "";
 
     const statusClass = "status-" + order.status.toLowerCase().replace(/\s+/g, "-");
-    
+
     let itemsHtml = "";
     order.items.forEach(ci => {
       itemsHtml += `
@@ -401,7 +478,7 @@ function renderOrdersList() {
 
 // ===== Global Window Handlers for Multi-page support =====
 
-window.filterCategory = function(category) {
+window.filterCategory = function (category) {
   currentCategory = category;
   applyAllFilters();
 
@@ -418,7 +495,7 @@ window.filterCategory = function(category) {
   });
 };
 
-window.checkout = function() {
+window.checkout = function () {
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
@@ -448,7 +525,7 @@ window.checkout = function() {
   window.location.href = "orders.html";
 };
 
-window.reorderOrder = function(orderId) {
+window.reorderOrder = function (orderId) {
   const pastOrder = orders.find(o => o.id === orderId);
   if (!pastOrder) return;
 
@@ -743,24 +820,24 @@ function setupContactForm() {
   const formSuccess = document.getElementById("form-success");
   if (!form || !formSuccess) return;
 
-  const nameInput    = form.querySelector("#name");
-  const emailInput   = form.querySelector("#email");
+  const nameInput = form.querySelector("#name");
+  const emailInput = form.querySelector("#email");
   const messageInput = form.querySelector("#message");
 
-  const errorName    = form.querySelector("#error-name");
-  const errorEmail   = form.querySelector("#error-email");
+  const errorName = form.querySelector("#error-name");
+  const errorEmail = form.querySelector("#error-email");
   const errorMessage = form.querySelector("#error-message");
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    errorName.textContent    = "";
-    errorEmail.textContent   = "";
+    errorName.textContent = "";
+    errorEmail.textContent = "";
     errorMessage.textContent = "";
     formSuccess.style.display = "none";
 
-    const nameVal    = nameInput.value.trim();
-    const emailVal   = emailInput.value.trim();
+    const nameVal = nameInput.value.trim();
+    const emailVal = emailInput.value.trim();
     const messageVal = messageInput.value.trim();
 
     let valid = true;
@@ -888,6 +965,7 @@ async function init() {
   applyAllFilters();
   updateCartCount();
   renderCart();
+  renderFavoritesList();
 
   // Run dynamic order rendering and simulated status progress updates
   renderOrdersList();
