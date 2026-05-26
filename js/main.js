@@ -547,6 +547,23 @@ window.reorderOrder = function(orderId) {
 
 // ===== Cart Operations =====
 
+// ===== Toast Notification =====
+
+function showToast(message) {
+  const toast = document.getElementById("toast-notification");
+
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toast.hideTimeout);
+
+  toast.hideTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+
 function addToCart(id) {
   const item = menuItems.find(i => i.id === id);
   if (!item) return;
@@ -561,6 +578,15 @@ function addToCart(id) {
   cartManager.addItem(item, 1);
   updateCartCount();
   renderCart();
+  saveCart();
+  showToast(`🛒 ${item.name} added to cart`);
+  if (cartCount) {
+  cartCount.classList.add("cart-bounce");
+
+  setTimeout(() => {
+    cartCount.classList.remove("cart-bounce");
+  }, 400);
+}
 
   if (cartSidebar) {
     cartSidebar.setAttribute("aria-hidden", "false");
@@ -569,18 +595,24 @@ function addToCart(id) {
 }
 
 function removeFromCart(id) {
-  const cartItem = cartManager.getItem(id);
-  if (!cartItem) return;
+  const cartIndex = cart.findIndex(ci => ci.item.id === id);
 
-  if (cartItem.quantity > 1) {
-    cartManager.decreaseQuantity(id);
+  if (cartIndex === -1) return;
+
+  const removedItem = cart[cartIndex].item;
+
+  if (cart[cartIndex].quantity > 1) {
+    cart[cartIndex].quantity--;
   } else {
     cartManager.removeItem(id);
   }
+
   updateCartCount();
   renderCart();
-}
+  saveCart();
 
+  showToast(`🗑️ ${removedItem.name} removed from cart`);
+}
 // ===== Event Listeners =====
 
 function setupFilterButtons() {
