@@ -1245,8 +1245,8 @@ mark.highlight {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.2rem;
-  padding-top: 0.8rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid #fbe9e7;
 }
 
@@ -1259,18 +1259,17 @@ mark.highlight {
 .card-footer .add-btn {
   background: #2e7d32;
   color: white;
-  padding: 0.4rem 1.2rem;
-  border-radius: 50px;
   border: none;
-  font-weight: 700;
-  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
-  transition: all 0.3s ease;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
 .card-footer .add-btn:hover {
   background: #1b5e20;
-  box-shadow: 0 6px 15px rgba(27, 94, 32, 0.5);
-  transform: translateY(-1px);
+  transform: scale(1.05);
 }
 
 /* ===== Orders Dashboard Layout ===== */
@@ -1538,4 +1537,41 @@ mark.highlight {
   background: #bf360c;
   box-shadow: 0 6px 20px rgba(191, 54, 12, 0.4);
   transform: translateY(-1px);
+}
+/* quantity control */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #2e7d32;
+  border-radius: 999px;
+  padding: 6px 10px;
+  min-width: 120px;
+  height: 44px;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+}
+
+.quantity-control button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  color: #2e7d32;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantity-control button:hover {
+  transform: scale(1.08);
+}
+
+.quantity-number {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
 }
