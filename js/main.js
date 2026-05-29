@@ -1466,9 +1466,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
-    if (toggleBtn) toggleBtn.textContent = "☀️";
-  } else {
-    if (toggleBtn) toggleBtn.textContent = "🌙";
   }
 });
 
@@ -1478,10 +1475,8 @@ if (toggleBtn) {
     document.body.classList.toggle("dark");
 
     if (document.body.classList.contains("dark")) {
-      toggleBtn.textContent = "☀️";
       localStorage.setItem("theme", "dark");
     } else {
-      toggleBtn.textContent = "🌙";
       localStorage.setItem("theme", "light");
     }
   });
