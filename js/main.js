@@ -4,6 +4,7 @@ let orders = JSON.parse(localStorage.getItem('chaatOrders')) || [];
 
 // Initialize cart from cart manager (will be set after DOM loads)
 let cart = [];
+let loyaltyPointsApplied = false;
 
 // Will be initialized in setupCartManager() after document loads
 function setupCartManager() {
@@ -56,14 +57,180 @@ const cartItemsContainer = document.getElementById("cart-items");
 const cartTotal = document.getElementById("cart-total") || document.getElementById("total-price");
 const checkoutBtn = document.getElementById("checkout-btn");
 
+const couponCodeInput = document.getElementById("coupon-code-input");
+const applyCouponBtn = document.getElementById("apply-coupon-btn");
+const removeCouponBtn = document.getElementById("remove-coupon-btn");
+const couponMessage = document.getElementById("coupon-message");
+const couponSubtotalEl = document.getElementById("coupon-subtotal");
+const couponDiscountEl = document.getElementById("coupon-discount");
+const couponDiscountRow = document.getElementById("coupon-discount-row");
+const couponGrandTotalEl = document.getElementById("coupon-grand-total");
+const appliedCouponLabel = document.getElementById("applied-coupon-label");
+
+const COUPON_STORAGE_KEY = 'chaatCoupon';
+const coupons = {
+  WELCOME10: { type: "percent", value: 10 },
+  SAVE50: { type: "flat", value: 50 }
+};
+let activeCoupon = null;
+
 // Cart is managed by CartManager - initialized in main startup
 
 function formatPrice(price) {
   return `₹${price}`;
 }
 
-// ===== Fuzzy Match & Highlighter Utilities =====
+function getCartSubtotal() {
+  return cart.reduce((sum, ci) => sum + ci.item.price * ci.quantity, 0);
+}
 
+function loadCouponFromStorage() {
+  const stored = localStorage.getItem(COUPON_STORAGE_KEY);
+  if (!stored) return null;
+
+  try {
+    const data = JSON.parse(stored);
+    if (!data || !data.code) return null;
+
+    const code = String(data.code).trim().toUpperCase();
+    const coupon = coupons[code];
+    if (!coupon) {
+      localStorage.removeItem(COUPON_STORAGE_KEY);
+      return null;
+    }
+
+    activeCoupon = { code, ...coupon };
+    return activeCoupon;
+  } catch (error) {
+    localStorage.removeItem(COUPON_STORAGE_KEY);
+    return null;
+  }
+}
+
+function saveCouponToStorage() {
+  if (activeCoupon) {
+    localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify({ code: activeCoupon.code, appliedAt: Date.now() }));
+  } else {
+    localStorage.removeItem(COUPON_STORAGE_KEY);
+  }
+}
+
+function validateCouponCode(input) {
+  const code = String(input || '').trim().toUpperCase();
+
+  if (!code) {
+    return { valid: false, message: 'Enter a coupon code.' };
+  }
+
+  const coupon = coupons[code];
+  if (!coupon) {
+    return { valid: false, message: 'Invalid or expired coupon.' };
+  }
+
+  return { valid: true, code, coupon };
+}
+
+function calculateCouponDiscount(subtotal) {
+  if (!activeCoupon) return 0;
+
+  if (activeCoupon.type === 'percent') {
+    return Math.min(Math.round((subtotal * activeCoupon.value) / 100), subtotal);
+  }
+
+  if (activeCoupon.type === 'flat') {
+    return Math.min(activeCoupon.value, subtotal);
+  }
+
+  return 0;
+}
+
+function showCouponMessage(message, type = 'success') {
+  if (couponMessage) {
+    couponMessage.textContent = message;
+    couponMessage.classList.toggle('success', type === 'success');
+    couponMessage.classList.toggle('error', type === 'error');
+  }
+
+  showToast(type === 'success' ? `✅ ${message}` : `⚠️ ${message}`);
+}
+
+function updateCartSummary() {
+  const subtotal = getCartSubtotal();
+  const discount = calculateCouponDiscount(subtotal);
+  const total = Math.max(subtotal - discount, 0);
+
+  if (couponSubtotalEl) couponSubtotalEl.textContent = formatPrice(subtotal);
+  if (couponDiscountEl) couponDiscountEl.textContent = `- ${formatPrice(discount)}`;
+  if (couponDiscountRow) couponDiscountRow.style.display = discount > 0 ? 'flex' : 'none';
+  if (couponGrandTotalEl) {
+    couponGrandTotalEl.textContent = formatPrice(total);
+  } else if (cartTotal) {
+    cartTotal.textContent = `Total: ${formatPrice(total)}`;
+  }
+  if (appliedCouponLabel) appliedCouponLabel.textContent = activeCoupon ? `Coupon applied: ${activeCoupon.code}` : '';
+
+  if (checkoutBtn) checkoutBtn.disabled = cart.length === 0;
+}
+
+function applyCouponCode() {
+  const result = validateCouponCode(couponCodeInput ? couponCodeInput.value : '');
+
+  if (!result.valid) {
+    activeCoupon = null;
+    saveCouponToStorage();
+    showCouponMessage(result.message, 'error');
+    updateCartSummary();
+    return false;
+  }
+
+  activeCoupon = { code: result.code, ...result.coupon };
+  saveCouponToStorage();
+  showCouponMessage(`${result.code} applied!`, 'success');
+  if (removeCouponBtn) removeCouponBtn.style.display = 'inline-flex';
+  updateCartSummary();
+  return true;
+}
+
+function removeCoupon() {
+  activeCoupon = null;
+  saveCouponToStorage();
+
+  if (couponCodeInput) couponCodeInput.value = '';
+  if (removeCouponBtn) removeCouponBtn.style.display = 'none';
+  showCouponMessage('Coupon removed.', 'success');
+  updateCartSummary();
+}
+
+function setupCouponListeners() {
+  if (applyCouponBtn) {
+    applyCouponBtn.addEventListener('click', applyCouponCode);
+  }
+
+  if (couponCodeInput) {
+    couponCodeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        applyCouponCode();
+      }
+    });
+  }
+
+  if (removeCouponBtn) {
+    removeCouponBtn.addEventListener('click', removeCoupon);
+  }
+
+  if (loadCouponFromStorage() && couponCodeInput) {
+    couponCodeInput.value = activeCoupon.code;
+  }
+
+  if (activeCoupon && removeCouponBtn) {
+    removeCouponBtn.style.display = 'inline-flex';
+  }
+
+  updateCartSummary();
+}
+
+// ===== Fuzzy Match & Highlighter Utilities =====
 function fuzzyMatch(target, query) {
   if (!target || !query) return false;
   const t = target.toLowerCase();
@@ -308,6 +475,7 @@ function renderCart() {
          </p>`;
       if (checkoutBtn) checkoutBtn.disabled = true;
       if (cartTotal) cartTotal.textContent = "Total: ₹0";
+      updateCartSummary();
       return;
     }
 
@@ -353,22 +521,94 @@ function renderCart() {
       const removeBtn = cartItem.querySelector(".cart-item-remove");
       if (removeBtn) {
         removeBtn.addEventListener("click", () => {
-          cart = cart.filter(ci => ci.item.id !== item.id);
+          cartManager.removeItem(item.id);
           updateCartCount();
-  updateFavCount();
+          updateFavCount();
           renderCart();
-          saveCart();
         });
       }
 
       cartItemsContainer.appendChild(cartItem);
     });
 
+    updateCartSummary();
+    // Render Loyalty Points Widget at the end of the cart list
+    const points = typeof loyalty !== 'undefined' ? loyalty.getBalance() : 0;
+    const loyaltyDiv = document.createElement("div");
+    loyaltyDiv.className = "cart-loyalty-widget";
+
     const total = cart.reduce(
       (sum, ci) => sum + ci.item.price * ci.quantity,
       0
     );
-    if (cartTotal) cartTotal.textContent = `Total: ${formatPrice(total)}`;
+    const discountVal = Math.min(points, total);
+
+    loyaltyDiv.innerHTML = `
+      <div class="loyalty-widget-header">
+        <span class="loyalty-icon">🌟</span>
+        <div class="loyalty-info">
+          <span class="loyalty-title">Loyalty Wallet</span>
+          <span class="loyalty-desc">Balance: <strong>${points}</strong> pts (₹${points})</span>
+        </div>
+      </div>
+      ${points > 0 ? `
+      <div class="loyalty-redeem-action">
+        <label class="loyalty-toggle">
+          <input type="checkbox" id="apply-loyalty-checkbox" ${loyaltyPointsApplied ? 'checked' : ''} />
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Apply ₹${discountVal} Discount</span>
+        </label>
+      </div>
+      ` : `
+      <div class="loyalty-empty-message">
+        <span>Earn 10 points for every ₹100 spent!</span>
+      </div>
+      `}
+    `;
+
+    cartItemsContainer.appendChild(loyaltyDiv);
+
+    const checkbox = loyaltyDiv.querySelector("#apply-loyalty-checkbox");
+    if (checkbox) {
+      checkbox.addEventListener("change", (e) => {
+        loyaltyPointsApplied = e.target.checked;
+
+        // Update total price display directly
+        const freshDiscount = Math.min(points, total);
+        let totalHtml = "";
+        if (loyaltyPointsApplied && points > 0) {
+          const finalTotal = total - freshDiscount;
+          totalHtml = `
+            <div class="cart-total-breakdown">
+              <div class="breakdown-row"><span>Subtotal:</span> <span>${formatPrice(total)}</span></div>
+              <div class="breakdown-row discount"><span>Loyalty Discount:</span> <span>-${formatPrice(freshDiscount)}</span></div>
+              <div class="breakdown-row final"><span>Total:</span> <span>${formatPrice(finalTotal)}</span></div>
+            </div>
+          `;
+        } else {
+          totalHtml = `Total: ${formatPrice(total)}`;
+        }
+
+        if (cartTotal) {
+          cartTotal.innerHTML = totalHtml;
+        }
+      });
+    }
+
+    let totalHtml = "";
+    if (loyaltyPointsApplied && points > 0) {
+      const finalTotal = total - discountVal;
+      totalHtml = `
+        <div class="cart-total-breakdown">
+          <div class="breakdown-row"><span>Subtotal:</span> <span>${formatPrice(total)}</span></div>
+          <div class="breakdown-row discount"><span>Loyalty Discount:</span> <span>-${formatPrice(discountVal)}</span></div>
+          <div class="breakdown-row final"><span>Total:</span> <span>${formatPrice(finalTotal)}</span></div>
+        </div>
+      `;
+    } else {
+      totalHtml = `Total: ${formatPrice(total)}`;
+    }
+    if (cartTotal) cartTotal.innerHTML = totalHtml;
     if (checkoutBtn) checkoutBtn.disabled = false;
 
   }, 600);
@@ -448,13 +688,13 @@ function renderOrdersList() {
   orders.forEach(order => {
     const card = document.createElement("article");
     card.className = "order-card";
-    
+
     const isPreparing = order.status === "Preparing" || order.status === "On the Way" || order.status === "Delivered" ? "active" : "";
     const isOnWay = order.status === "On the Way" || order.status === "Delivered" ? "active" : "";
     const isDelivered = order.status === "Delivered" ? "active" : "";
 
     const statusClass = "status-" + order.status.toLowerCase().replace(/\s+/g, "-");
-    
+
     let itemsHtml = "";
     order.items.forEach(ci => {
       itemsHtml += `
@@ -502,6 +742,17 @@ function renderOrdersList() {
       </div>
 
       <div class="order-card-footer">
+        ${order.discount && order.discount > 0 ? `
+        <div class="order-discount-details" style="font-size:0.9rem;color:#777;margin-bottom:0.5rem;text-align:right;width:100%;">
+          <span>Subtotal: ${formatPrice(order.subtotal || (order.total + order.discount))}</span> |
+          <span style="color:#e64a19;font-weight:600;">Points Redeemed: ${order.pointsRedeemed || order.discount} (-${formatPrice(order.discount)})</span>
+        </div>
+        ` : ''}
+        ${order.pointsEarned && order.pointsEarned > 0 ? `
+        <div class="order-points-earned" style="font-size:0.9rem;color:#28a745;margin-bottom:0.5rem;text-align:right;width:100%;font-weight:600;">
+          <span>🌟 Earned +${order.pointsEarned} Loyalty Points</span>
+        </div>
+        ` : ''}
         <div class="order-total-price">
           <span>Total Paid:</span>
           <strong>${formatPrice(order.total)}</strong>
@@ -520,7 +771,7 @@ function renderOrdersList() {
 
 // ===== Global Window Handlers for Multi-page support =====
 
-window.filterCategory = function(category) {
+window.filterCategory = function (category) {
   currentCategory = category;
   applyAllFilters();
 
@@ -537,7 +788,7 @@ window.filterCategory = function(category) {
   });
 };
 
-window.checkout = async function() {
+window.checkout = async function () {
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return false;
@@ -550,6 +801,18 @@ window.checkout = async function() {
     return false;
   }
 
+  const finalTotal = subtotal - discount;
+
+  // Award points on final total paid (10 points per ₹100 spent)
+  let pointsEarned = 0;
+  if (typeof loyalty !== 'undefined') {
+    pointsEarned = loyalty.awardPoints(finalTotal);
+  }
+
+  const subtotal = getCartSubtotal();
+  const discount = calculateCouponDiscount(subtotal);
+  const totalAmount = Math.max(subtotal - discount, 0);
+
   const newOrder = {
     id: "CB-" + Math.floor(100000 + Math.random() * 900000),
     date: new Date().toLocaleDateString(undefined, {
@@ -558,7 +821,14 @@ window.checkout = async function() {
     }),
     timestamp: Date.now(),
     items: JSON.parse(JSON.stringify(cart)),
-    total: cart.reduce((sum, ci) => sum + ci.item.price * ci.quantity, 0),
+    total: totalAmount,
+    discount,
+    coupon: activeCoupon?.code || null,
+    subtotal: subtotal,
+    discount: discount,
+    pointsRedeemed: pointsRedeemed,
+    pointsEarned: pointsEarned,
+    total: finalTotal,
     status: "Pending",
     deliveryAddress: {
       latitude: validationResult.userLocation.latitude,
@@ -571,6 +841,9 @@ window.checkout = async function() {
 
   orders.unshift(newOrder);
   localStorage.setItem('chaatOrders', JSON.stringify(orders));
+
+  // Reset points applied state
+  loyaltyPointsApplied = false;
 
   cartManager.clear();
   updateCartCount();
@@ -586,7 +859,7 @@ window.checkout = async function() {
   return true;
 };
 
-window.reorderOrder = function(orderId) {
+window.reorderOrder = function (orderId) {
   const pastOrder = orders.find(o => o.id === orderId);
   if (!pastOrder) return;
 
@@ -630,7 +903,7 @@ function addToCart(id) {
   const item = menuItems.find(i => i.id === id);
   if (!item) return;
 
-   //Check if item is available
+  //Check if item is available
   const isAvailable = item.available !== undefined ? item.available : true;
   if (!isAvailable) {
     alert(`${item.name} is currently out of stock!`);
@@ -641,15 +914,14 @@ function addToCart(id) {
   updateCartCount();
   updateFavCount();
   renderCart();
-  saveCart();
   showToast(`🛒 ${item.name} added to cart`);
   if (cartCount) {
-  cartCount.classList.add("cart-bounce");
+    cartCount.classList.add("cart-bounce");
 
-  setTimeout(() => {
-    cartCount.classList.remove("cart-bounce");
-  }, 400);
-}
+    setTimeout(() => {
+      cartCount.classList.remove("cart-bounce");
+    }, 400);
+  }
 
   if (cartSidebar) {
     cartSidebar.setAttribute("aria-hidden", "false");
@@ -664,16 +936,10 @@ function removeFromCart(id) {
 
   const removedItem = cart[cartIndex].item;
 
-  if (cart[cartIndex].quantity > 1) {
-    cart[cartIndex].quantity--;
-  } else {
-    cartManager.removeItem(id);
-  }
-
+  cartManager.decreaseQuantity(id);
   updateCartCount();
   updateFavCount();
   renderCart();
-  saveCart();
 
   showToast(`🗑️ ${removedItem.name} removed from cart`);
 }
@@ -906,19 +1172,19 @@ function setupContactForm() {
   const formSuccess = document.getElementById("form-success");
   if (!form || !formSuccess) return;
 
-  const nameInput    = form.querySelector("#name");
-  const emailInput   = form.querySelector("#email");
+  const nameInput = form.querySelector("#name");
+  const emailInput = form.querySelector("#email");
   const messageInput = form.querySelector("#message");
 
-  const errorName    = form.querySelector("#error-name");
-  const errorEmail   = form.querySelector("#error-email");
+  const errorName = form.querySelector("#error-name");
+  const errorEmail = form.querySelector("#error-email");
   const errorMessage = form.querySelector("#error-message");
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    errorName.textContent    = "";
-    errorEmail.textContent   = "";
+    errorName.textContent = "";
+    errorEmail.textContent = "";
     errorMessage.textContent = "";
     formSuccess.style.display = "none";
 
@@ -1046,6 +1312,7 @@ async function init() {
   // Bind interactive UI listeners immediately for instant input responsiveness (high INP)
   setupCartToggle();
   setupFilterButtons();
+  setupCouponListeners();
   setupOrderNowScroll();
   setupSearchSuggestions();
   setupSearch();
@@ -1151,9 +1418,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
-    if (toggleBtn) toggleBtn.textContent = "☀️";
-  } else {
-    if (toggleBtn) toggleBtn.textContent = "🌙";
   }
 });
 
@@ -1163,10 +1427,8 @@ if (toggleBtn) {
     document.body.classList.toggle("dark");
 
     if (document.body.classList.contains("dark")) {
-      toggleBtn.textContent = "☀️";
       localStorage.setItem("theme", "dark");
     } else {
-      toggleBtn.textContent = "🌙";
       localStorage.setItem("theme", "light");
     }
   });

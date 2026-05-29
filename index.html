@@ -37,7 +37,17 @@
         <button aria-label="Search" id="search-btn"></button>
         <div class="search-suggestions" id="search-suggestions" style="display: none;"></div>
       </div>
-  <button id="theme-toggle" class="theme-toggle">🌙</button>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-icon sun-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </span>
+          <span class="theme-toggle-icon moon-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </span>
+          <span class="theme-toggle-thumb"></span>
+        </span>
+      </button>
     </nav>
   </div>
 </header>
@@ -45,12 +55,12 @@
 <!-- Hero Section -->
 <section id="hero" class="hero" role="region" aria-label="Hero Section">
   <div class="hero-content">
-    <h1>Authentic Indian Street Food Delivered Hot!</h1>
-    <p>Delicious Samosa, Kachori, Pani Puri and more, right to your doorstep within 5 km.</p>
+    <h1>Satisfy Your Cravings with Tasty Indian Delights</h1>
+    <p>From crunchy bites to tangy flavors, experience India’s most loved street food anytime, anywhere.</p>
     <button class="btn-primary" id="order-now-btn" aria-haspopup="true" aria-controls="menu">Order Now</button>
   </div>
   <div class="hero-image" aria-hidden="true">
-    <img src="img/chaat.png" alt="Colorful Indian street food platter" />
+    <img src="img/hero_img.png" alt="Colorful Indian street food platter" />
   </div>
 </section>
 
@@ -275,6 +285,9 @@
 <script src="js/delivery-tracker.js"></script>
 <script src="js/geolocation.js"></script>
 <script src="js/sanitization.js"></script>
+<script src="js/loyalty.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
