@@ -280,6 +280,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
       overflow: visible !important;
       text-decoration: none !important;
+      white-space: nowrap !important;
     }
     .cart-btn-modern:hover {
       background: #e64a19 !important;
