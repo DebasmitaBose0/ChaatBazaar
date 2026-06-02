@@ -309,7 +309,8 @@ function createCard(item, highlightQuery = "") {
   card.innerHTML = `
     <img src="${item.image}" 
          alt="${item.name}" 
-         loading="lazy" />
+         loading="lazy"
+         decoding="async" />
 
     <div class="card-content">
 
