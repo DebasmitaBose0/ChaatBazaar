@@ -381,7 +381,8 @@
       "profile-name-value": loggedInUser.name || "",
       "profile-email-value": loggedInUser.email || "",
       "profile-phone-value": loggedInUser.phone || "",
-      "profile-location-value": loggedInUser.location || ""
+      "profile-location-value": loggedInUser.location || "",
+      "profile-loyalty-value": (window.loyalty && typeof window.loyalty.getBalance === 'function' ? window.loyalty.getBalance() + " pts" : "0 pts")
     };
 
     Object.keys(profileMap).forEach((elementId) => {
