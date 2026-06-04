@@ -2,6 +2,26 @@
 let menuItems = [];
 let currentCategory = "All";
 let orders = JSON.parse(localStorage.getItem('chaatOrders')) || [];
+
+const FavoritesManager = {
+  getItems() {
+    return JSON.parse(localStorage.getItem('chaatFavorites')) || [];
+  },
+  toggleItem(item) {
+    let favorites = this.getItems();
+    const index = favorites.findIndex(f => f.id === item.id);
+    if (index === -1) {
+      favorites.push(item);
+    } else {
+      favorites.splice(index, 1);
+    }
+    localStorage.setItem('chaatFavorites', JSON.stringify(favorites));
+  },
+  isFavorite(itemId) {
+    const favorites = this.getItems();
+    return favorites.some(f => f.id === itemId);
+  }
+};
  
 // Initialize cart from cart manager (will be set after DOM loads)
 let cart = [];
@@ -316,6 +336,7 @@ function createCard(item, highlightQuery = "") {
       <div class="card-meta">
         <span class="rating" title="Rating: ${item.rating || 5.0}">${ratingStars} ${item.rating || '5.0'}</span>
         <span class="spice"  title="Spice level: ${item.spice}">${spiceIcon}</span>
+        <button class="fav-toggle-btn" aria-label="Toggle favorite for ${item.name}" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#e64a19;padding:0.25rem;">${FavoritesManager.isFavorite(item.id) ? '❤️' : '🤍'}</button>
       </div>
 
       <h3>${highlightedName}</h3>
@@ -375,6 +396,19 @@ main
       renderRecentlyViewed();
     }
   });
+
+  const favBtn = card.querySelector(".fav-toggle-btn");
+  if (favBtn) {
+    favBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      FavoritesManager.toggleItem(item);
+      favBtn.textContent = FavoritesManager.isFavorite(item.id) ? '❤️' : '🤍';
+      updateFavCount();
+      if (typeof renderFavorites === 'function') {
+        renderFavorites();
+      }
+    });
+  }
  
   return card;
 }
@@ -421,18 +455,15 @@ function renderFavorites() {
   const favoritesContainer = document.getElementById("favorites-container");
   if (!favoritesContainer) return;
  
-  if (typeof RecentlyViewed === 'undefined') return;
-  const recentItems = RecentlyViewed.getItems();
+  const favItems = FavoritesManager.getItems();
   favoritesContainer.innerHTML = "";
  
-  if (recentItems.length === 0) {
-    recentlyViewedSection.style.display =
-      "none";
-
+  if (favItems.length === 0) {
+    favoritesContainer.innerHTML = `<p style="text-align:center;color:#5d4037;width:100%;margin-top:2rem;">You haven't added any favorites yet.</p>`;
     return;
   }
  
-  recentItems.forEach(item => favoritesContainer.appendChild(createCard(item)));
+  favItems.forEach(item => favoritesContainer.appendChild(createCard(item)));
 }
  
 // ===== Unified Interactive Filter Engine =====
@@ -699,8 +730,8 @@ function updateCartCount() {
  
 function updateFavCount() {
   const favCount = document.getElementById("fav-count");
-  if (favCount && typeof RecentlyViewed !== 'undefined') {
-    favCount.textContent = RecentlyViewed.getItems().length;
+  if (favCount) {
+    favCount.textContent = FavoritesManager.getItems().length;
   }
 }
  
